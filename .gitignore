@@ -1,0 +1,16 @@
+# config
+/config/certs
+
+# nodejs
+package-lock.json
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.idea
+*.iml
