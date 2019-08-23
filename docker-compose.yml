@@ -4,10 +4,9 @@ services:
 
   apache2:
     image: integ1:5000/agrica/rhel7-apache24-php55-oidc:latest
-    container_name: apache246
+    container_name: apache2
     depends_on:
       - fpm
-
     environment:
       APACHE_APP_DIR: "/DATA/app"
       APACHE_LOG_DIR: "/var/log/httpd/app"
@@ -67,7 +66,6 @@ services:
     container_name: metricbeat
     depends_on:
       - elasticsearch
-      - kibana
       - fpm
       - apache2
     volumes:
@@ -76,6 +74,17 @@ services:
     networks:
       - apache2-network
 
+  filebeat:
+    image: docker.elastic.co/beats/filebeat-oss:7.3.1
+    container_name: filebeat
+    depends_on:
+      - elasticsearch
+    volumes:
+      - "./sources/:/DATA/php-exporter/"
+      - "./sources/etc/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml"
+      - "./logs/httpd:/var/log/httpd"
+    networks:
+      - apache2-network
 
 
 networks:

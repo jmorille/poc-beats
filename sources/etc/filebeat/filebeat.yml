@@ -1,6 +1,7 @@
-metricbeat.config.modules:
-  path: /DATA/php-exporter/etc/metricbeat/modules.d/*.yml
-  reload.enabled: true
+filebeat.config:
+  modules:
+    path: /DATA/php-exporter/etc/filebeat/modules.d/*.yml
+    reload.enabled: true
 
 processors:
   - add_labels:
