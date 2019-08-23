@@ -5,6 +5,9 @@ services:
   apache2:
     image: integ1:5000/agrica/rhel7-apache24-php55-oidc:latest
     container_name: apache246
+    depends_on:
+      - fpm
+
     environment:
       APACHE_APP_DIR: "/DATA/app"
       APACHE_LOG_DIR: "/var/log/httpd/app"
@@ -12,7 +15,7 @@ services:
       HOST_PORT: "80"
       FPM_HOST: "fpm"
     volumes:
-      - "./src/test/config/apache/vhost-app.conf:/etc/httpd/conf.d/vhost-app.conf:ro"
+      - "./src/test/config/apache-vhost-app.conf:/etc/httpd/conf.d/vhost-app.conf:ro"
       - "./src/test/web/sources/htdocs:/DATA/app/htdocs"
       - "./src/test/web/sources/theme/217:/DATA/app/htdocs/css:ro"
       - "./logs/httpd:/var/log/httpd"
@@ -23,17 +26,57 @@ services:
 
 
   fpm:
-    image: php:7-fpm
+    image: php:7.1-fpm
     container_name: fpm7
     volumes:
       - "./src/test/web/sources/htdocs:/DATA/app/htdocs"
       - "./src/test/web/sources/theme/217:/DATA/app/htdocs/css:ro"
       - "./src/test/config/fpm-app.conf:/usr/local/etc/php-fpm.d/www.conf:ro"
-#      - "./logs/fpm/:/var/log/fpm/"
+      - "./logs/fpm/:/var/log/fpm/"
     ports:
       - "9000:9000"
+      - "9001:9001"
     networks:
       - apache2-network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.3.1
+    container_name: elasticsearch
+    environment:
+      discovery.type: "single-node"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - apache2-network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:7.3.1
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_URL: 'http://elasticsearch:9200'
+    depends_on:
+      - elasticsearch
+    networks:
+      - apache2-network
+
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat-oss:7.3.1
+    container_name: metricbeat
+    depends_on:
+      - elasticsearch
+      - kibana
+      - fpm
+      - apache2
+    volumes:
+      - "./sources/:/DATA/php-exporter/"
+      - "./sources/etc/metricbeat/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml"
+    networks:
+      - apache2-network
+
+
 
 networks:
   apache2-network:

@@ -1,0 +1,12 @@
+metricbeat.config.modules:
+  path: /DATA/php-exporter/etc/metricbeat/modules.d/*.yml
+  reload.enabled: true
+
+
+output.elasticsearch:
+  hosts: '${ELASTICSEARCH_HOSTS:elasticsearch:9200}'
+#  username: '${ELASTICSEARCH_USERNAME:}'
+#  password: '${ELASTICSEARCH_PASSWORD:}'
+
+setup.kibana:
+  host: "http://kibana:5601"

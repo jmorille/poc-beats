@@ -7,4 +7,12 @@ La stack PHP est constitué:
 * Serveur FPM 
 
 Le monitoring est assuré par:
-* PHP-FPM : https://github.com/bakins/php-fpm-exporter/releases
+* Apache : <https://github.com/Lusitaniae/apache_exporter/releases>
+* PHP-FPM : <https://github.com/bakins/php-fpm-exporter/releases>
+
+## Run
+
+```bash
+ ./php-fpm-exporter.linux.amd64 --fastcgi="tcp://127.0.0.1:9000/status"
+```
+ 
